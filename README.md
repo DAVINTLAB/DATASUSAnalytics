@@ -1,5 +1,5 @@
 # DATASUS Analytics Framework
-
+---
 
 This repository serves as the **main entry point** for the *Data Governance Framework* developed for the **Brazilian Hospital Information System (SIH-RD/SUS)**. 
 It contains two independent components: a **relational data warehouse (PostgreSQL + dbt)**, which implements the governance and ETL processes, and a **Text-to-SQL LLM agent**, designed exclusively for **data querying** through **Datural Language**.
