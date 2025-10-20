@@ -1,4 +1,4 @@
-# DATASUS Analytics Framework
+## DATASUS Analytics Framework
 ---
 
 This repository serves as the **main entry point** for the *Data Governance Framework* developed for the **Brazilian Hospital Information System (SIH-RD/SUS)**. 
