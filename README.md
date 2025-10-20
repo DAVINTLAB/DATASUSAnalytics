@@ -1,16 +1,15 @@
 # SIH Governance Framework
 
 This repository serves as the **main entry point** for the *Data Governance Framework* developed for the **Brazilian Hospital Information System (SIH-RD/SUS)**. 
-It includes two independent components: a **relational data warehouse (PostgreSQL + dbt)** and a **Text-to-SQL LLM agent** designed exclusively for **data querying** through **natural language interaction**.
-
+It contains two independent components: a **relational data warehouse (PostgreSQL + dbt)**, which implements the governance and ETL processes, and a **Text-to-SQL LLM agent**, designed exclusively for **data querying** through **Datural Language**.
 ---
 
 ## Purpose
 
 This repository aims to provide:
-- A unified structure that organizes both the **data warehouse** and the **LLM agent** under a shared governance approach. 
-- An implementation guided by the **pillars of data governance**, such as **architecture**, **modeling**, **integration**, and **data quality**. 
-- Independent execution of both components, ensuring modularity and flexibility for development and testing.
+- A modular architecture that separates the **data governance and ETL processes** from the **LLM agent**. 
+- A data pipeline guided by the **pillars of data governance**, including **architecture**, **modeling**, **integration**, and **data quality**. 
+- A read-only LLM agent that queries the governed data without altering or persisting information.
 
 ---
 
