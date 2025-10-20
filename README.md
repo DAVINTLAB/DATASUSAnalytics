@@ -1,10 +1,8 @@
 # DATASUS Analytics Framework
 
----
-
-
 This repository serves as the **main entry point** for the *Data Governance Framework* developed for the **Brazilian Hospital Information System (SIH-RD/SUS)**. 
-It contains two independent components: a **relational data warehouse (PostgreSQL + dbt)**, which implements the governance and ETL processes, and a **Text-to-SQL LLM agent**, designed exclusively for **data querying** through **Datural Language**.
+It contains two independent components: a **relational data warehouse (PostgreSQL + dbt)**, which implements the governance and ETL processes, and a **Text-to-SQL LLM agent**, designed exclusively for **data querying** through **Natural Language**.
+
 ---
 
 ## Purpose
@@ -12,7 +10,7 @@ It contains two independent components: a **relational data warehouse (PostgreSQ
 This repository aims to provide:
 - A modular architecture that separates the **data governance and ETL processes** from the **LLM agent**. 
 - A data pipeline guided by the **pillars of data governance**, including **architecture**, **modeling**, **integration**, and **data quality**. 
-- A read-only LLM agent that queries the governed data without altering or persisting information.
+- A LLM agent that queries the governed data without altering or persisting information.
 
 ---
 
