@@ -1,11 +1,11 @@
-# 🧠 SIH Governance Framework
+#  SIH Governance Framework
 
 This repository serves as the **main entry point** for the *Data Governance Framework* developed for the **Brazilian Hospital Information System (SIH-RD/SUS)**. 
 It integrates a **relational data warehouse (PostgreSQL + dbt)** and a **Text-to-SQL LLM agent**, enabling both **data validation** and **natural language interaction** with the database.
 
 ---
 
-## 🎯 Purpose
+##  Purpose
 
 This repository aims to provide:
 - A unified environment for managing both the **data warehouse** and the **LLM agent** components. 
@@ -14,10 +14,10 @@ This repository aims to provide:
 
 ---
 
-## 📂 Repository Structure
+##  Repository Structure
 
 ```bash
 DATASUSAnalytics/
 ├── database/      # Relational data warehouse + dbt tests
-└── llm/           # Text-to-SQL agent (LangChain + Llama 3)
+└── llm/           # Text-to-SQL agent 
 
