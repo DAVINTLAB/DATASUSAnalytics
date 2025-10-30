@@ -65,7 +65,7 @@ O servidor estará disponível em `http://localhost:3000`
 O Agent TXT2SQL deve estar rodando na porta 8000. Para iniciar o Agent:
 
 ```bash
-cd /home/maiconkevyn/PycharmProjects/txt2sql_claude_s
+cd /home/maiconkevyn/PycharmProjects/agent
 python src/interfaces/api/main.py
 ```
 
