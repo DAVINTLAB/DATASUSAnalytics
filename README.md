@@ -136,3 +136,11 @@ python evaluation/run_dag_evaluation.py --difficulty EASY
 # Generate visualizations and report
 python evaluation/generate_report.py
 ```
+
+
+## Citation
+
+Please refer to this work by citing the paper indicated below.
+
+M. K. Moraes, I. Figueiredo, V. Marques, J. Santos, I. H. Manssour. From Questions to Answers: A Natural Language Interface for DATASUS Hospitalization Data. I Escola Regional de Aprendizado de Máquina e Inteligência Artificial da Região Sul (ERAMIA-RS), 2025, Porto Alegre/RS, Brasil. 
+SBC, Porto Alegre, Brasil.
