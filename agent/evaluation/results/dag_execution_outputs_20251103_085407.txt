@@ -2,8 +2,8 @@
 QUERY EXECUTION OUTPUTS - MANUAL VALIDATION
 ================================================================================
 
-Generated: 2025-10-30 13:56:42
-Total Questions: 51
+Generated: 2025-11-03 08:54:07
+Total Questions: 59
 
 ================================================================================
 GT001: Quantas internações foram registradas no total?
@@ -128,7 +128,7 @@ Ground Truth Results:
   Total rows: 1
 
 Predicted SQL:
-  SELECT COUNT(*) FROM dado_ibge WHERE "populacao" IS NOT NULL;
+  SELECT COUNT(DISTINCT mu.codigo_6d) FROM dado_ibge di JOIN municipios mu ON di.codigo_municipio_completo = mu.codigo_ibge;
 
 Predicted Results:
   Row 1: [5570]
@@ -282,7 +282,7 @@ Ground Truth Results:
   Total rows: 1
 
 Predicted SQL:
-  SELECT COUNT(i."N_AIH") FROM internacoes i WHERE i."SEXO" = 1 LIMIT 100;
+  SELECT COUNT(i."N_AIH") FROM internacoes i WHERE i."SEXO" = 1;
 
 Predicted Results:
   Row 1: [4854879]
@@ -304,10 +304,10 @@ Ground Truth Results:
   Total rows: 1
 
 Predicted SQL:
-  SELECT COUNT(mo."N_AIH") FROM mortes mo JOIN internacoes i ON mo."N_AIH" = i."N_AIH" JOIN cid10 c ON mo."CID_MORTE" = c."CID" WHERE c."CD_DESCRICAO" ILIKE '%meningite%' AND mo."N_AIH" IS NOT NULL;
+  SELECT COUNT(mo."N_AIH") FROM mortes mo JOIN internacoes i ON mo."N_AIH" = i."N_AIH" JOIN cid10 c ON i."CID_NOTIF" = c."CID" WHERE c."CD_DESCRICAO" ILIKE '%meningite%' AND i."CID_NOTIF" IS NOT NULL;
 
 Predicted Results:
-  Row 1: [207]
+  Row 1: [0]
   Total rows: 1
 
 Execution Accuracy: [Not available]
@@ -392,11 +392,10 @@ Ground Truth Results:
   Total rows: 1
 
 Predicted SQL:
-  SELECT "nome_municipio" FROM dado_ibge WHERE "populacao" = ( SELECT MAX("populacao") FROM dado_ibge );
+  SELECT mu.nome, i.populacao FROM dado_ibge i JOIN municipios mu ON i.codigo_municipio_completo = mu.codigo_6d ORDER BY i.populacao DESC LIMIT 1;
 
 Predicted Results:
-  Row 1: ['MaceiÃ³']
-  Total rows: 1
+  [Empty result set]
 
 Execution Accuracy: [Not available]
 
@@ -496,7 +495,7 @@ Ground Truth Results:
   Total rows: 1
 
 Predicted SQL:
-  SELECT COUNT(DISTINCT i."CNES") FROM internacoes i JOIN mortes mo ON i."N_AIH" = mo."N_AIH";
+  SELECT COUNT(DISTINCT i."CNES") FROM internacoes i JOIN mortes mo ON i."N_AIH" = mo."N_AIH" WHERE mo."CID_MORTE" IS NOT NULL;
 
 Predicted Results:
   Row 1: [348]
@@ -582,7 +581,7 @@ Ground Truth Results:
   Total rows: 1
 
 Predicted SQL:
-  SELECT COUNT(DISTINCT i."N_AIH") FROM condicoes_especificas ce JOIN internacoes i ON ce."N_AIH" = i."N_AIH" JOIN mortes m ON i."N_AIH" = m."N_AIH" WHERE ce."IND_VDRL" IS NOT NULL;
+  SELECT COUNT(DISTINCT i."N_AIH") FROM condicoes_especificas c JOIN internacoes i ON c."N_AIH" = i."N_AIH" JOIN mortes m ON i."N_AIH" = m."N_AIH";
 
 Predicted Results:
   Row 1: [430]
@@ -626,7 +625,7 @@ Ground Truth Results:
   Total rows: 1
 
 Predicted SQL:
-  SELECT COUNT(DISTINCT i."N_AIH") FROM internacoes i JOIN cbor cb ON i."N_AIH" = cb."N_AIH" JOIN uti_detalhes ud ON i."N_AIH" = ud."N_AIH";
+  SELECT COUNT(DISTINCT i."N_AIH") FROM internacoes i JOIN cbor cb ON i."N_AIH" = cb."N_AIH" JOIN uti_detalhes ud ON i."N_AIH" = ud."N_AIH" WHERE cb."CBOR" IS NOT NULL;
 
 Predicted Results:
   Row 1: [144]
@@ -636,7 +635,7 @@ Execution Accuracy: [Not available]
 
 
 ================================================================================
-GT028: Qual a taxa de mortalidade por município (top 10)?
+GT028: Quais sao os 10 municípios com a maior taxa de mortalidade?
 Difficulty: HARD
 ================================================================================
 
@@ -657,10 +656,20 @@ Ground Truth Results:
   Total rows: 10
 
 Predicted SQL:
-  [AGENT FAILED - No SQL generated]
+  SELECT mu.nome, COUNT(mo."N_AIH") AS total_mortes, (COUNT(mo."N_AIH")::FLOAT / ( SELECT COUNT("N_AIH") FROM internacoes i JOIN municipios mu ON i."MUNIC_RES" = mu.codigo_6d WHERE mu.codigo_6d = mu.codigo_6d )) AS taxa_mortalidade FROM mortes mo JOIN internacoes i ON mo."N_AIH" = i."N_AIH" JOIN municipios mu ON i."MUNIC_RES" = mu.codigo_6d GROUP BY mu.nome ORDER BY taxa_mortalidade DESC LIMIT 10;
 
 Predicted Results:
-  [Agent failed - no SQL to execute]
+  Row 1: ['Porto Alegre', 75857, 0.006882225726878785]
+  Row 2: ['Canoas', 20972, 0.0019027121813952818]
+  Row 3: ['Pelotas', 16672, 0.001512589046739564]
+  Row 4: ['Caxias do Sul', 15284, 0.0013866609279251138]
+  Row 5: ['ViamÃ£o', 14044, 0.001274160303047651]
+  Row 6: ['Novo Hamburgo', 13324, 0.0012088373595704146]
+  Row 7: ['GravataÃ\xad', 13131, 0.0011913271816660998]
+  Row 8: ['Rio Grande', 13037, 0.001182798908489905]
+  Row 9: ['Alvorada', 12601, 0.001143242237162023]
+  Row 10: ['Passo Fundo', 12215, 0.0011082218813533934]
+  Total rows: 10
 
 Execution Accuracy: [Not available]
 
@@ -674,14 +683,14 @@ Ground Truth SQL:
   SELECT AVG(u."VAL_UTI") AS valor_medio_uti_homens FROM uti_detalhes u JOIN internacoes i ON u."N_AIH" = i."N_AIH" WHERE i."SEXO" = 1 AND u."VAL_UTI" IS NOT NULL;
 
 Ground Truth Results:
-  Row 1: [35773.86666130428]
+  Row 1: [35773.86666130432]
   Total rows: 1
 
 Predicted SQL:
   SELECT AVG(u."VAL_UTI") AS media_uti_homem FROM uti_detalhes u JOIN internacoes i ON u."N_AIH" = i."N_AIH" WHERE i."SEXO" = 1;
 
 Predicted Results:
-  Row 1: [35773.866661304266]
+  Row 1: [35773.86666130433]
   Total rows: 1
 
 Execution Accuracy: [Not available]
@@ -722,7 +731,7 @@ Ground Truth Results:
   Total rows: 1
 
 Predicted SQL:
-  SELECT "latitude", "longitude" FROM municipios WHERE "nome" = 'Porto Alegre';
+  SELECT latitude, longitude FROM municipios WHERE nome ILIKE '%Porto Alegre%' LIMIT 1;
 
 Predicted Results:
   Row 1: [-30.0318, -51.2065]
@@ -744,10 +753,10 @@ Ground Truth Results:
   Total rows: 1
 
 Predicted SQL:
-  SELECT COUNT(*) FROM municipios WHERE "estado" = 'RS';
+  SELECT COUNT(DISTINCT mu.codigo_6d) FROM municipios mu JOIN dado_ibge di ON mu.codigo_6d = di.codigo_municipio_completo WHERE di.sigla_estado = 'RS';
 
 Predicted Results:
-  Row 1: [497]
+  Row 1: [0]
   Total rows: 1
 
 Execution Accuracy: [Not available]
@@ -762,14 +771,14 @@ Ground Truth SQL:
   SELECT AVG("IDADE") AS idade_media FROM internacoes WHERE "IDADE" IS NOT NULL;
 
 Ground Truth Results:
-  Row 1: [43.85401567327997]
+  Row 1: [43.85401567327995]
   Total rows: 1
 
 Predicted SQL:
   SELECT AVG(i."IDADE") AS idade_media FROM internacoes i;
 
 Predicted Results:
-  Row 1: [43.85401567327997]
+  Row 1: [43.85401567327998]
   Total rows: 1
 
 Execution Accuracy: [Not available]
@@ -832,7 +841,7 @@ Ground Truth Results:
   Total rows: 1
 
 Predicted SQL:
-  SELECT COUNT(*) FROM internacoes WHERE EXTRACT(YEAR FROM "DT_INTER") = 2015;
+  SELECT COUNT(*) FROM internacoes WHERE EXTRACT(YEAR FROM "DT_INTER") = 2015 LIMIT 100;
 
 Predicted Results:
   Row 1: [758854]
@@ -934,22 +943,23 @@ Execution Accuracy: [Not available]
 
 
 ================================================================================
-GT044: Quantos hospitais ficam em municípios com mais de 100k habitantes?
+GT044: Quantos hospitais atenderam casos de UTI em 2020?
 Difficulty: HARD
 ================================================================================
 
 Ground Truth SQL:
-  SELECT COUNT(DISTINCT h."CNES") AS hospitais_grandes_municipios FROM hospital h JOIN internacoes i ON h."CNES" = i."CNES" JOIN municipios m ON i."MUNIC_RES" = m.codigo_6d JOIN dado_ibge d ON m.codigo_ibge = d.codigo_municipio_completo WHERE d.populacao > 100;
+  SELECT COUNT(DISTINCT i."CNES") FROM internacoes i JOIN uti_detalhes u ON i."N_AIH" = u."N_AIH" WHERE EXTRACT(YEAR FROM i."DT_INTER") = 2020;
 
 Ground Truth Results:
-  Row 1: [159]
+  Row 1: [90]
   Total rows: 1
 
 Predicted SQL:
-  [AGENT FAILED - No SQL generated]
+  SELECT COUNT(DISTINCT i."CNES") FROM internacoes i JOIN uti_detalhes u ON i."N_AIH" = u."N_AIH" WHERE EXTRACT(YEAR FROM i."DT_INTER") = 2020;
 
 Predicted Results:
-  [Agent failed - no SQL to execute]
+  Row 1: [90]
+  Total rows: 1
 
 Execution Accuracy: [Not available]
 
@@ -1007,13 +1017,13 @@ Ground Truth SQL:
   SELECT CASE WHEN i."IDADE" < 18 THEN 'Menor' WHEN i."IDADE" < 60 THEN 'Adulto' ELSE 'Idoso' END AS faixa_etaria, AVG(u."VAL_UTI") AS custo_medio_uti FROM internacoes i JOIN uti_detalhes u ON i."N_AIH" = u."N_AIH" WHERE i."IDADE" IS NOT NULL AND u."VAL_UTI" IS NOT NULL GROUP BY CASE WHEN i."IDADE" < 18 THEN 'Menor' WHEN i."IDADE" < 60 THEN 'Adulto' ELSE 'Idoso' END;
 
 Ground Truth Results:
-  Row 1: ['Adulto', 39410.961206112304]
-  Row 2: ['Idoso', 36491.48874380082]
-  Row 3: ['Menor', 32791.09114230801]
+  Row 1: ['Adulto', 39410.96120611232]
+  Row 2: ['Idoso', 36491.48874380083]
+  Row 3: ['Menor', 32791.09114230805]
   Total rows: 3
 
 Predicted SQL:
-  SELECT EXTRACT(YEAR FROM i."DT_INTER") AS ano, EXTRACT(MONTH FROM i."DT_INTER") AS mes, EXTRACT(DAY FROM i."DT_INTER") AS dia, i."IDADE" AS faixa_etaria, AVG(ud."VAL_UTI") AS custo_medio FROM internacoes i JOIN uti_detalhes ud ON i."N_AIH" = ud."N_AIH" GROUP BY EXTRACT(YEAR FROM i."DT_INTER"), EXTRACT(MONTH FROM i."DT_INTER"), EXTRACT(DAY FROM i."DT_INTER"), i."IDADE" ORDER BY EXTRACT(YEAR FROM i."DT_INTER"), EXTRACT(MONTH FROM i."DT_INTER"), EXTRACT(DAY FROM i."DT_INTER"), i."IDADE" LIMIT 100;
+  SELECT EXTRACT(YEAR FROM i."DT_INTER") AS ano, EXTRACT(MONTH FROM i."DT_INTER") AS mes, EXTRACT(DAY FROM i."DT_INTER") AS dia, i."IDADE", AVG(ud."VAL_UTI") AS media_custo_uti FROM internacoes i JOIN uti_detalhes ud ON i."N_AIH" = ud."N_AIH" GROUP BY EXTRACT(YEAR FROM i."DT_INTER"), EXTRACT(MONTH FROM i."DT_INTER"), EXTRACT(DAY FROM i."DT_INTER"), i."IDADE" ORDER BY EXTRACT(YEAR FROM i."DT_INTER"), EXTRACT(MONTH FROM i."DT_INTER"), EXTRACT(DAY FROM i."DT_INTER"), i."IDADE" LIMIT 100;
 
 Predicted Results:
   Row 1: [Decimal('2007'), Decimal('7'), Decimal('10'), 0.0, 46704.0]
@@ -1077,10 +1087,21 @@ Ground Truth Results:
   Total rows: 16
 
 Predicted SQL:
-  [AGENT FAILED - No SQL generated]
+  SELECT EXTRACT(YEAR FROM i."DT_INTER") AS ano, COUNT(i."N_AIH") AS total_internacoes FROM internacoes i GROUP BY EXTRACT(YEAR FROM i."DT_INTER") ORDER BY ano ASC;
 
 Predicted Results:
-  [Agent failed - no SQL to execute]
+  Row 1: [Decimal('2007'), 44375]
+  Row 2: [Decimal('2008'), 719203]
+  Row 3: [Decimal('2009'), 729377]
+  Row 4: [Decimal('2010'), 722333]
+  Row 5: [Decimal('2011'), 710201]
+  Row 6: [Decimal('2012'), 722833]
+  Row 7: [Decimal('2013'), 737424]
+  Row 8: [Decimal('2014'), 763362]
+  Row 9: [Decimal('2015'), 758854]
+  Row 10: [Decimal('2016'), 749140]
+  ... (6 more rows)
+  Total rows: 16
 
 Execution Accuracy: [Not available]
 
@@ -1098,10 +1119,10 @@ Ground Truth Results:
   Total rows: 1
 
 Predicted SQL:
-  SELECT COUNT(i."N_AIH") AS total_internacoes FROM internacoes i JOIN cid10 c ON i."DIAG_PRINC" = c."CID" WHERE EXTRACT(MONTH FROM i."DT_INTER") BETWEEN 6 AND 8 AND (c."CD_DESCRICAO" ILIKE '%pulm%' OR c."CD_DESCRICAO" ILIKE '%respir%' OR c."CD_DESCRICAO" ILIKE '%pneum%') AND c."CID" LIKE 'J%' LIMIT 100;
+  SELECT COUNT(i."N_AIH") AS total_internacoes FROM internacoes i JOIN cid10 c ON i."DIAG_PRINC" = c."CID" WHERE EXTRACT(MONTH FROM i."DT_INTER") BETWEEN 6 AND 8 AND (c."CD_DESCRICAO" ILIKE '%pulm%' OR c."CD_DESCRICAO" ILIKE '%respir%' OR c."CD_DESCRICAO" ILIKE '%pneum%') OR (c."CID" LIKE 'J%' OR c."CD_DESCRICAO" ILIKE '%bronqu%');
 
 Predicted Results:
-  Row 1: [361606]
+  Row 1: [1543926]
   Total rows: 1
 
 Execution Accuracy: [Not available]
@@ -1148,22 +1169,24 @@ Execution Accuracy: [Not available]
 
 
 ================================================================================
-GT053: Qual a taxa de mortalidade hospitalar geral do Rio Grande do Sul?
+GT053: Qual a taxa de mortalidade no estado do Rio Grande do Sul em 2021?
 Difficulty: HARD
 ================================================================================
 
 Ground Truth SQL:
-  SELECT ROUND((COUNT(DISTINCT m."N_AIH")::numeric / COUNT(DISTINCT i."N_AIH") * 100), 2) AS taxa_mortalidade_perc FROM internacoes i LEFT JOIN mortes m ON i."N_AIH" = m."N_AIH";
+  SELECT ROUND((COUNT(DISTINCT m."N_AIH")::numeric / COUNT(DISTINCT i."N_AIH") * 100), 2) AS taxa_mortalidade_perc FROM internacoes i LEFT JOIN mortes m ON i."N_AIH" = m."N_AIH" LEFT JOIN municipios mu ON i."MUNIC_RES" = mu.codigo_6d LEFT JOIN dado_ibge d ON mu.codigo_ibge = d.codigo_municipio_completo WHERE EXTRACT(YEAR FROM i."DT_INTER") = 2021 AND d.sigla_uf = 'RS';
 
 Ground Truth Results:
-  Row 1: [Decimal('5.17')]
-  Total rows: 1
+  ERROR: ERRO:  coluna d.sigla_uf não existe
+LINE 1: ... WHERE EXTRACT(YEAR FROM i."DT_INTER") = 2021 AND d.sigla_uf...
+                                                             ^
+
 
 Predicted SQL:
-  [AGENT FAILED - No SQL generated]
+  SELECT COUNT(i."N_AIH") AS total_mortes, i."MUNIC_RES" AS municipio, EXTRACT(YEAR FROM i."DT_INTER") AS ano FROM mortes mo JOIN internacoes i ON mo."N_AIH" = i."N_AIH" JOIN municipios mu ON i."MUNIC_RES" = mu.codigo_6d WHERE EXTRACT(YEAR FROM i."DT_INTER") = 2021 AND mu.estado ILIKE '%rio grande do sul%' GROUP BY i."MUNIC_RES", EXTRACT(YEAR FROM i."DT_INTER") LIMIT 100;
 
 Predicted Results:
-  [Agent failed - no SQL to execute]
+  [Empty result set]
 
 Execution Accuracy: [Not available]
 
@@ -1181,7 +1204,7 @@ Ground Truth Results:
   Total rows: 1
 
 Predicted SQL:
-  SELECT COUNT(mo."N_AIH") AS total_mortes, COUNT(i."N_AIH") AS total_internacoes FROM mortes mo JOIN internacoes i ON mo."N_AIH" = i."N_AIH" WHERE i."IDADE" BETWEEN 30 AND 45;
+  SELECT COUNT(mo."N_AIH") AS total_mortes, COUNT(i."N_AIH") AS total_internacoes FROM mortes mo JOIN internacoes i ON mo."N_AIH" = i."N_AIH" JOIN municipios mu ON i."MUNIC_RES" = mu.codigo_6d WHERE i."IDADE" BETWEEN 30 AND 45 AND mo."CID_MORTE" IS NOT NULL;
 
 Predicted Results:
   Row 1: [37626, 37626]
@@ -1226,6 +1249,182 @@ Predicted Results:
   Row 9: ['Rio Grande', 206073]
   Row 10: ['GravataÃ\xad', 204791]
   Total rows: 10
+
+Execution Accuracy: [Not available]
+
+
+================================================================================
+GT056: Quantos códigos cid 10  distintos existem?
+Difficulty: EASY
+================================================================================
+
+Ground Truth SQL:
+   SELECT COUNT(DISTINCT "CID") FROM cid10;
+
+Ground Truth Results:
+  Row 1: [14254]
+  Total rows: 1
+
+Predicted SQL:
+  SELECT COUNT(DISTINCT "CID") FROM cid10;
+
+Predicted Results:
+  Row 1: [14254]
+  Total rows: 1
+
+Execution Accuracy: [Not available]
+
+
+================================================================================
+GT058: Qual o valor total gasto em internações?
+Difficulty: EASY
+================================================================================
+
+Ground Truth SQL:
+  SELECT SUM("VAL_TOT") FROM internacoes;
+
+Ground Truth Results:
+  Row 1: [0.0]
+  Total rows: 1
+
+Predicted SQL:
+  SELECT SUM(i."VAL_TOT") FROM internacoes i;
+
+Predicted Results:
+  Row 1: [0.0]
+  Total rows: 1
+
+Execution Accuracy: [Not available]
+
+
+================================================================================
+GT059: Qual o maior valor de internação registrado?
+Difficulty: EASY
+================================================================================
+
+Ground Truth SQL:
+  SELECT MAX("VAL_TOT") FROM internacoes;
+
+Ground Truth Results:
+  Row 1: [0.0]
+  Total rows: 1
+
+Predicted SQL:
+  SELECT MAX("VAL_TOT") FROM internacoes;
+
+Predicted Results:
+  Row 1: [0.0]
+  Total rows: 1
+
+Execution Accuracy: [Not available]
+
+
+================================================================================
+GT060: Quantos registros de raça/cor estão cadastrados?
+Difficulty: EASY
+================================================================================
+
+Ground Truth SQL:
+  SELECT COUNT(*) FROM internacoes WHERE "RACA_COR" IS NOT NULL;
+
+Ground Truth Results:
+  Row 1: [11022199]
+  Total rows: 1
+
+Predicted SQL:
+  SELECT COUNT(*) FROM internacoes WHERE "RACA_COR" IS NOT NULL;
+
+Predicted Results:
+  Row 1: [11022199]
+  Total rows: 1
+
+Execution Accuracy: [Not available]
+
+
+================================================================================
+GT061: Quantas internações ocorreram em 2020?
+Difficulty: EASY
+================================================================================
+
+Ground Truth SQL:
+  SELECT COUNT(*) FROM internacoes WHERE EXTRACT(YEAR FROM "DT_INTER") = 2020;
+
+Ground Truth Results:
+  Row 1: [663681]
+  Total rows: 1
+
+Predicted SQL:
+  SELECT COUNT(*) FROM internacoes WHERE EXTRACT(YEAR FROM "DT_INTER") = 2020;
+
+Predicted Results:
+  Row 1: [663681]
+  Total rows: 1
+
+Execution Accuracy: [Not available]
+
+
+================================================================================
+GT062: Qual a menor idade registrada nas internações?
+Difficulty: EASY
+================================================================================
+
+Ground Truth SQL:
+  SELECT MIN("IDADE") FROM internacoes;
+
+Ground Truth Results:
+  Row 1: [0.0]
+  Total rows: 1
+
+Predicted SQL:
+  SELECT MIN(i."IDADE") FROM internacoes i;
+
+Predicted Results:
+  Row 1: [0.0]
+  Total rows: 1
+
+Execution Accuracy: [Not available]
+
+
+================================================================================
+GT063: Qual o total de diárias registradas em todas as internações?
+Difficulty: EASY
+================================================================================
+
+Ground Truth SQL:
+  SELECT SUM("QT_DIARIAS") FROM internacoes;
+
+Ground Truth Results:
+  Row 1: [298658]
+  Total rows: 1
+
+Predicted SQL:
+  SELECT SUM(i."QT_DIARIAS") AS total_diarias FROM internacoes i;
+
+Predicted Results:
+  Row 1: [298658]
+  Total rows: 1
+
+Execution Accuracy: [Not available]
+
+
+================================================================================
+GT064: Qual a maior idade registrada nas internações?
+Difficulty: EASY
+================================================================================
+
+Ground Truth SQL:
+  SELECT MAX("IDADE") FROM internacoes;
+
+Ground Truth Results:
+  Row 1: [99.0]
+  Total rows: 1
+
+Predicted SQL:
+  SELECT MAX(i."IDADE") FROM internacoes i;
+
+Predicted Results:
+  Row 1: [99.0]
+  Total rows: 1
 
 Execution Accuracy: [Not available]
 

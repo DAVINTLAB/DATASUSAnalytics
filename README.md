@@ -1,53 +1,17 @@
-[//]: # (# DATASUS Analytics Framework)
-
-[//]: # ()
-[//]: # (This repository serves as the **main entry point** for the *Data Governance Framework* developed for the **Brazilian Hospital Information System &#40;SIH-RD/SUS&#41;**. )
-
-[//]: # (It contains two independent components: a **relational data warehouse &#40;PostgreSQL + dbt&#41;**, which implements the governance and ETL processes, and a **Text-to-SQL LLM agent**, designed exclusively for **data querying** through **Natural Language**.)
-
-[//]: # ()
-[//]: # (---)
-
-[//]: # ()
-[//]: # ([//]: # &#40;## Purpose&#41;)
-[//]: # ()
-[//]: # ([//]: # &#40;&#41;)
-[//]: # ([//]: # &#40;This repository aims to provide:&#41;)
-[//]: # ()
-[//]: # ([//]: # &#40;- A modular architecture that separates the **data governance and ETL processes** from the **LLM agent**. &#41;)
-[//]: # ()
-[//]: # ([//]: # &#40;- A data pipeline guided by the **pillars of data governance**, including **architecture**, **modeling**, **integration**, and **data quality**. &#41;)
-[//]: # ()
-[//]: # ([//]: # &#40;- A LLM agent that queries the governed data without altering or persisting information.&#41;)
-[//]: # ()
-[//]: # (---)
-
-[//]: # ()
-[//]: # (## Repository Structure)
-
-[//]: # ()
-[//]: # (```bash)
-
-[//]: # (DATASUSAnalytics/)
-
-[//]: # (├── database/      # Complete ETL pipeline and dbt project for the data warehouse)
-
-[//]: # (└── llm/           # Text-to-SQL agent for querying in natural language)
-
 # Text-to-SQL Datasus Agent Evaluation
 
 Evaluation of Text-to-SQL agent performance on Brazilian healthcare data (DATASUS/SIH-RS) using LLaMA 3.1:8b.
 
 ## Overview
 
-**Dataset**: 51 ground truth queries across three difficulty levels
-- EASY (17): Single table, basic filters, COUNT operations
+**Dataset**: 59 ground truth queries across three difficulty levels
+- EASY (25): Single table, basic filters, COUNT operations
 - MEDIUM (19): Multi-table JOINs, GROUP BY, aggregations
 - HARD (15): Complex JOINs, subqueries, mortality calculations
 
 **Model**: Ollama LLaMA 3.1:8b
-**Evaluation Date**: October 30, 2025
-**Total Execution Time**: 690.32s (13.54s avg per query)
+**Evaluation Date**: November 3, 2025
+**Total Execution Time**: 531.1s (9.0s avg per query)
 
 ## Evaluation Metrics
 
@@ -73,12 +37,12 @@ Three metrics following Spider benchmark methodology:
 
 | Metric | Score |
 |--------|-------|
-| Agent Success Rate | 92.2% |
-| Execution Accuracy (EX) | 87.2% |
-| Component Matching (CM) | 63.5% |
-| Exact Match (EM) | 12.8% |
+| Agent Success Rate | 100.0% |
+| Execution Accuracy (EX) | 81.6% |
+| Component Matching (CM) | 61.6% |
+| Exact Match (EM) | 16.9% |
 
-High EX (87.2%) with low EM (12.8%) indicates the agent generates semantically correct but syntactically different SQL queries.
+High EX (81.6%) with low EM (16.9%) indicates the agent generates semantically correct but syntactically different SQL queries.
 
 ---
 
@@ -88,25 +52,25 @@ High EX (87.2%) with low EM (12.8%) indicates the agent generates semantically c
 
 | Difficulty | Questions | Success Rate | EX | CM | EM |
 |-----------|-----------|--------------|----|----|-----|
-| EASY | 17 | 100.0% (17/17) | 100.0% | 77.8% | 5.9% |
-| MEDIUM | 19 | 94.7% (18/19) | 88.9% | 67.8% | 27.8% |
-| HARD | 15 | 80.0% (12/15) | 66.7% | 36.7% | 0.0% |
+| EASY | 25 | 100.0% (25/25) | 96.0% | 75.0% | 16.0% |
+| MEDIUM | 19 | 100.0% (19/19) | 78.9% | 61.1% | 15.8% |
+| HARD | 15 | 100.0% (15/15) | 60.0% | 43.3% | 6.7% |
 
 ### Performance by Query Complexity
 
 **EASY Queries**
-- Perfect execution accuracy (100.0%)
-- Strong component matching (77.8%)
-- Covers: Single table operations, basic filtering, COUNT aggregations
+- Excellent execution accuracy (96.0%)
+- Strong component matching (75.0%)
+- Covers: Single table operations, basic filtering, COUNT aggregations, MIN/MAX operations
 
 **MEDIUM Queries**
-- Strong execution accuracy (88.9%)
-- Moderate component matching (67.8%)
+- Good execution accuracy (78.9%)
+- Moderate component matching (61.1%)
 - Covers: Multi-table JOINs, GROUP BY operations, temporal filters
 
 **HARD Queries**
-- Moderate execution accuracy (66.7%)
-- Lower component matching (36.7%)
+- Moderate execution accuracy (60.0%)
+- Lower component matching (43.3%)
 - Covers: Mortality rate calculations, nested subqueries, complex temporal analysis
 
 ---
@@ -117,7 +81,7 @@ High EX (87.2%) with low EM (12.8%) indicates the agent generates semantically c
 
 ![Metrics Comparison](agent/evaluation/results/visualizations/metrics_comparison.png)
 
-Shows EX (87.2%) significantly exceeds EM (12.8%), indicating semantically correct but syntactically different SQL generation.
+Shows EX (81.6%) significantly exceeds EM (16.9%), indicating semantically correct but syntactically different SQL generation.
 
 ### Performance by Difficulty
 
@@ -129,31 +93,14 @@ Demonstrates performance degradation with increasing complexity. Gap between EX 
 
 ![Success Rate](agent/evaluation/results/visualizations/success_rate.png)
 
-Overall success rate: 92.2% (47/51 queries). Distribution shows strong performance across all difficulty levels.
+Overall success rate: 100.0% (59/59 queries). Distribution shows strong performance across all difficulty levels.
 
----
-
-## Discussion
-
-### Key Findings
-
-**Strengths**
-- High execution accuracy (87.2%) demonstrates correct result generation
-- Perfect performance on EASY queries (100% EX)
-- Strong overall success rate (92.2%) with low failure rate
-- Component matching (63.5%) indicates semantic SQL understanding
-
-**Limitations**
-- HARD query performance (66.7% EX) requires improvement
-- Low exact match (12.8%) reflects syntactic variations from ground truth
-- Complex mortality rate calculations remain challenging
-- Nested subqueries and multi-table temporal joins show higher error rates
 
 ### Analysis
 
 **Low EM with High EX**
 
-The disparity between EM (12.8%) and EX (87.2%) is expected and indicates SQL flexibility. Multiple syntactically different queries can produce identical results.
+The disparity between EM (16.9%) and EX (81.6%) is expected and indicates SQL flexibility. Multiple syntactically different queries can produce identical results.
 
 Example:
 ```sql
@@ -188,31 +135,4 @@ python evaluation/run_dag_evaluation.py --difficulty EASY
 
 # Generate visualizations and report
 python evaluation/generate_report.py
-```
-
-### Output Files
-
-```
-evaluation/results/
-├── dag_evaluation_YYYYMMDD_HHMMSS.json      # Raw data
-├── dag_evaluation_report_YYYYMMDD_HHMMSS.txt # Summary
-├── EVALUATION_REPORT.txt                     # Full analysis
-└── visualizations/
-    ├── metrics_comparison.png
-    ├── difficulty_breakdown.png
-    ├── success_rate.png
-    └── metric_distributions.png
-```
-
----
-
-## Architecture
-
-```
-evaluation/
-├── dag/                       # DAG pipeline implementation
-├── metrics/                  # EM, CM, EX implementations
-├── DATASUS_GT.txt            # Ground truth queries
-├── run_dag_evaluation.py     # Evaluation runner
-└── generate_report.py        # Report generator
 ```
