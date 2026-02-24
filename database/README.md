@@ -9,8 +9,8 @@ Acesso ao terminal (Linux/Bash recomendado).
 
 Download dos Dados: Baixe o arquivo de dump através do link abaixo:
 
-[📥 Baixar Base de Dados (SharePoint PUC-RS)]([https://brpucrs-my.sharepoint.com/...](https://brpucrs-my.sharepoint.com/:u:/g/personal/isadora_figueiredo_edu_pucrs_br/IQCrKgYEvqJ1QKEETZYXnnYJAdrvqzK4jjRGz6hwjYoXvDM?e=3wfZo4))
-
+📥 Baixar Base de Dados 
+* **Banco de Dados (Dump):** [📥 Clique aqui para baixar o arquivo](https://brpucrs-my.sharepoint.com/:u:/g/personal/isadora_figueiredo_edu_pucrs_br/IQCrKgYEvqJ1QKEETZYXnnYJAdrvqzK4jjRGz6hwjYoXvDM?e=6fgv5e)
 ```
 # 1. Descompactar o arquivo de dump
 unzip sih_rs_dump.zip
