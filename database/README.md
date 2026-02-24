@@ -1,11 +1,10 @@
-SIH-RD RS Data (2008-2023) 🏥
+# SIH-RD RS Data (2008-2023) 🏥
 Este repositório contém a base de dados do Sistema de Informações Hospitalares (SIH-RD) do Rio Grande do Sul, estruturada para consulta via LLM. Os dados abrangem o período de 2008 a 2023.
 
-🚀 Como Iniciar
+## Como Iniciar
 1. Requisitos e Download
 PostgreSQL 13+ instalado.
 
-Acesso ao terminal (Linux/Bash recomendado).
 
 Download dos Dados: Baixe o arquivo de dump através do link abaixo:
 
